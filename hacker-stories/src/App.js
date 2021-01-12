@@ -34,42 +34,38 @@ const App = () => {
   return (
     <div>
       <h1>My Hacker Stories</h1>
-      <Search onSearch={handleSearch} search={searchTerm}/>
+      <Search onSearch={handleSearch} search={searchTerm} />
       <hr />
-      <List list={searchedStories}/>
+      <List list={searchedStories} />
     </div>
   )
 }
 
-const Search = (props) => {
+const Search = ({ onSearch, search }) => {
   return (
-
     <div>
       <label htmlFor="search">Search: </label>
       {/*using change handler from the parent*/}
-      <input id="search" type="text" value={props.search} onChange={props.onSearch} />
+      <input id="search" type="text" value={search} onChange={onSearch} />
     </div>
   )
 }
 
 
-const List = (props) => {
-  return (
-    <div>
-      {props.list.map((item) => {
-        return (
-          <div key={item.objectID}>
-            <span>
-              <a href={item.url}>{item.title}</a>
-            </span>
-            <span>{item.author}</span>
-            <span>{item.num_comments}</span>
-            <span>{item.points}</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+const List = ({ list }) => (
+  list.map(({ objectID, ...item }) => <Item key={objectID} {...item} />)
+);
+
+const Item = ({ title, url, author, num_comments, points }) =>
+(
+  <div>
+    <span>
+      <a href={url}>{title}</a>
+    </span>
+    <span>{author}</span>
+    <span>{num_comments}</span>
+    <span>{points}</span>
+  </div>
+)
 
 export default App;
