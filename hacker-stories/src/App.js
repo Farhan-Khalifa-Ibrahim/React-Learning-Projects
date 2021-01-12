@@ -22,31 +22,58 @@ const App = () => {
     },
   ];
 
-  const [searchTerm, setSearchTerm] = React.useState('React');
+  const useSemiPersistentState = (key, initalState) => {
+    //useState is used to update a variable value and re-render the page
+    const [value, setValue] = React.useState(
+      localStorage.getItem(key) || initalState
+    );
+
+    //useEffect will run every time the searchTerm updated
+    React.useEffect(() => {
+      localStorage.setItem(key, value)
+      console.log("useEffect is running")
+    }, [value, key])
+    return [value, setValue]
+  }
+
+
+  const [searchTerm, setSearchTerm] = useSemiPersistentState('search', 'React')
 
   const handleSearch = event => {
     setSearchTerm(event.target.value);
   }
 
+  const string = () => "Search"
+
   const searchedStories = stories.filter((story) =>
     story.title.toLowerCase().includes(searchTerm.toLowerCase()))
 
   return (
-    <div>
+    <>
       <h1>My Hacker Stories</h1>
-      <Search onSearch={handleSearch} search={searchTerm} />
+      <InputWithLabel id="search" value={searchTerm} isFocused={Boolean(true)} onInputChange={handleSearch}>
+        {string()}
+      </InputWithLabel>
       <hr />
       <List list={searchedStories} />
-    </div>
+    </>
   )
 }
 
-const Search = ({ onSearch, search }) => {
+const InputWithLabel = ({ id, value, isFocused, type = 'text',  onInputChange, children }) => {
+  const inputRef = React.useRef();
+
+  React.useEffect(()=>{
+    if (isFocused&&inputRef.current){
+      inputRef.current.focus()
+    }
+  },[isFocused])
+
   return (
     <div>
-      <label htmlFor="search">Search: </label>
+      <label htmlFor={id}>{children}</label>
       {/*using change handler from the parent*/}
-      <input id="search" type="text" value={search} onChange={onSearch} />
+      <input ref={inputRef} id={id} type={type} value={value} onChange={onInputChange} autoFocus={isFocused} />
     </div>
   )
 }
